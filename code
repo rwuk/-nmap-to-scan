@@ -1,0 +1,38 @@
+import subprocess
+
+def nmap_scan(ip_address):
+  """
+  This function uses nmap to scan an endpoint.
+
+  Args:
+    ip_address: The IP address of the endpoint to scan.
+
+  Returns:
+    A list of dictionaries, where each dictionary contains information about a port that is open on the endpoint.
+  """
+
+  command = ["nmap", "-sV", ip_address]
+  output = subprocess.check_output(command)
+  results = []
+  for line in output.decode("utf-8").splitlines():
+    if line.startswith("Nmap scan report for "):
+      host = line.split()[1]
+    elif line.startswith("Host is up (0.000000s latency)":
+      status = line.split()[4]
+    elif line.startswith(":"):
+      port = line.split(":")[0]
+      service = line.split(":")[1]
+      results.append({
+        "host": host,
+        "status": status,
+        "port": port,
+        "service": service
+      })
+
+  return results
+
+if __name__ == "__main__":
+  ip_address = "192.168.1.1"
+  results = nmap_scan(ip_address)
+  for result in results:
+    print(result)
